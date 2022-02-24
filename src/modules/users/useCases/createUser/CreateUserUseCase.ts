@@ -18,7 +18,7 @@ export class CreateUserUseCase {
 
     if (userAlreadyExists) {
       throw new CreateUserError();
-    }
+    };
 
     const passwordHash = await hash(password, 8);
 
@@ -29,5 +29,5 @@ export class CreateUserUseCase {
     });
 
     return user;
-  }
-}
+  };
+};
