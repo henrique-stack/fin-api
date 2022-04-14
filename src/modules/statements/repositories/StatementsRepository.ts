@@ -15,19 +15,21 @@ export class StatementsRepository implements IStatementsRepository {
 
   async create({
     user_id,
+    sender_id,
     amount,
     description,
     type
   }: ICreateStatementDTO): Promise<Statement> {
     const statement = this.repository.create({
       user_id,
+      sender_id,
       amount,
       description,
       type
     });
 
-    return this.repository.save(statement);
-  }
+    return await this.repository.save(statement);
+  };
 
   async findStatementOperation({ statement_id, user_id }: IGetStatementOperationDTO): Promise<Statement | undefined> {
     return this.repository.findOne(statement_id, {
@@ -35,30 +37,51 @@ export class StatementsRepository implements IStatementsRepository {
     });
   }
 
-  async getUserBalance({ user_id, with_statement = false }: IGetBalanceDTO):
+  async getUserBalance({ user_id, sender_id, with_statement = false }: IGetBalanceDTO):
     Promise<
       { balance: number } | { balance: number, statement: Statement[] }
     >
-  {
-    const statement = await this.repository.find({
-      where: { user_id }
-    });
+    {
+      // here is where only functionality is using per x,
+      // for instance: if your use functionality CreateStatementUseCase, So you going use 'user_id',
+      // if you use TransferUseCase you will use 'sender_id', because not is possible to use from both
+      // in same time.
 
-    const balance = statement.reduce((acc, operation) => {
-      if (operation.type === 'deposit') {
-        return acc + operation.amount;
-      } else {
-        return acc - operation.amount;
-      }
-    }, 0)
+      const statement = await this.repository.find({
+        where: [
+          { user_id },
+          { sender_id }
+        ]
+      });
 
-    if (with_statement) {
-      return {
-        statement,
-        balance
+      const balance = statement.reduce((acc, operation) => {
+        const amount = operation.amount;
+        const type = operation.type;
+
+         switch (type) {
+           case 'transfer':
+           amount - acc;
+           break;
+
+           case 'withdraw':
+           amount - acc;
+           break;
+           
+           default:
+           amount + acc;
+           break;
+         };
+         return amount;
+      }, 0);
+
+      if (with_statement) {
+        return {
+          statement,
+          balance
+        }
       }
+      
+      return { balance }
     }
-
-    return { balance }
-  }
-}
+};
+  

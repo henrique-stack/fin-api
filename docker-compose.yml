@@ -3,7 +3,7 @@ version: "3.9"
 services:
   database:
     image: postgres
-    container_name: fin_api
+    container_name: db_fin_api
     restart: always
     ports:
     - 5432:5432
