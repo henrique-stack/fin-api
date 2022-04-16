@@ -1,4 +1,3 @@
-import { join } from 'path';
 import {
   Column,
   CreateDateColumn,
@@ -26,10 +25,10 @@ export class Statement {
   user_id: string;
 
   @Column('uuid')
-  sender_id?: string;
+  received_id?: string;
 
   @ManyToOne(() => User, user => user.statement)
-  @JoinColumn([{ name: 'user_id' }, { name: 'sender_id'}])
+  @JoinColumn({ name: 'user_id' })
   user: User;
 
   @Column()
@@ -50,6 +49,6 @@ export class Statement {
   constructor() {
     if (!this.id) {
       this.id = uuid();
-    }
+    };
   }
 }

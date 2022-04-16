@@ -10,8 +10,8 @@ enum OperationType {
 
 export class CreateStatementController {
   async execute(request: Request, response: Response) {
-    const { id: user_id } = request.user;
     const { amount, description } = request.body;
+    const { id: user_id } = request.user;
 
     const splittedPath = request.originalUrl.split('/')
     const type = splittedPath[splittedPath.length - 1] as OperationType;
@@ -19,10 +19,10 @@ export class CreateStatementController {
     const createStatement = container.resolve(CreateStatementUseCase);
 
     const statement = await createStatement.execute({
+      description,
       user_id,
-      type,
       amount,
-      description
+      type,
     });
 
     return response.status(201).json(statement);

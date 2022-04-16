@@ -9,8 +9,8 @@ enum OperationType {
 class CreateTransferValueController {
     async execute(request: Request, response: Response): Promise<Response> {
         const { amount, description } = request.body;
-        const { id: sender_id } = request.user;
-        const { user_id } = request.params;
+        const { id: user_id } = request.user;
+        const { received_id } = request.params;
 
         const transferValueUseCase = container.resolve(TransferValueUseCase);
 
@@ -18,11 +18,11 @@ class CreateTransferValueController {
         const type = splitURL[ splitURL.length -2 ] as OperationType
 
         const result = await transferValueUseCase.execute({
-            sender_id,
-            description,
-            user_id,
+            type,
             amount,
-            type
+            user_id,
+            description,
+            received_id,
         });
 
         return response.send(result)

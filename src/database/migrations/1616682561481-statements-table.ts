@@ -14,9 +14,10 @@ export class accountsTable1616682561481 implements MigrationInterface {
         {
           name: 'user_id',
           type: 'uuid',
+          isNullable: true
         },
         {
-          name: 'sender_id',
+          name: 'received_id',
           type: 'uuid',
           isNullable: true
         },
@@ -49,15 +50,7 @@ export class accountsTable1616682561481 implements MigrationInterface {
       foreignKeys: [
         {
           name: 'statements',
-          columnNames: ['user_id'],
-          referencedTableName: 'users',
-          referencedColumnNames: ['id'],
-          onUpdate: 'CASCADE',
-          onDelete: 'CASCADE'
-        },
-        {
-          name: 'sender',
-          columnNames: ['sender_id'],
+          columnNames:['user_id'],
           referencedTableName: 'users',
           referencedColumnNames: ['id'],
           onUpdate: 'CASCADE',

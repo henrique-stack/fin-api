@@ -36,6 +36,6 @@ export class GetBalanceUseCase {
       with_statement: true
     });
 
-    return balance as IResponse;
+    return balance as IResponse
   }
 }

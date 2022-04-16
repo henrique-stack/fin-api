@@ -1,34 +1,32 @@
 import { IStatementsRepository } from "../../repositories/IStatementsRepository";
-import { Statement } from "../../entities/Statement";
 import { CreateStatementError } from "../createStatement/CreateStatementError";
-import { ITransferValueDTO } from "./ITransferValueDTO";
+import { IValueTransferDTO } from "./IValueTransferDTO";
 import { inject, injectable } from "tsyringe";
 
 @injectable()
 class TransferValueUseCase {
     constructor(
-        @inject("StatementsRepository")
-        private statementsRepository: IStatementsRepository
+      @inject('StatementsRepository')
+      private statementsRepository: IStatementsRepository
     ) { }
 
-      // aqui o sender_id está sendo o remetente da transferência.
-    async execute({ description, user_id, type, amount, sender_id }: ITransferValueDTO) {
-      const { balance } = await this.statementsRepository.getUserBalance({ sender_id });
+    async execute({ description, user_id, type, amount, received_id }: IValueTransferDTO ) {
+      
+      const { balance } = await this.statementsRepository.getUserBalance({ user_id });
 
-      // if (balance < amount) {
-      //   throw new CreateStatementError.InsufficientFunds();
-      // };
-      console.log('Balance', balance)
-      console.log('Amount', amount)
-      const result = await this.statementsRepository.create({
-        amount,
-        description,
-        sender_id,
-        user_id,
-        type
-      });
+      if(balance < amount) {
+        throw new CreateStatementError.InsufficientFunds();
+      };
 
-    return result;
+    const createTransfer = await this.statementsRepository.create({
+      type,
+      amount,
+      user_id,
+      received_id,
+      description,
+    })
+
+    return createTransfer;
   };
 };
 export { TransferValueUseCase };  

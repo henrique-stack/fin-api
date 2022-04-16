@@ -15,17 +15,17 @@ export class StatementsRepository implements IStatementsRepository {
 
   async create({
     user_id,
-    sender_id,
+    received_id,
     amount,
     description,
     type
   }: ICreateStatementDTO): Promise<Statement> {
     const statement = this.repository.create({
-      user_id,
-      sender_id,
+      type,
       amount,
+      user_id,
       description,
-      type
+      received_id,
     });
 
     return await this.repository.save(statement);
@@ -37,41 +37,24 @@ export class StatementsRepository implements IStatementsRepository {
     });
   }
 
-  async getUserBalance({ user_id, sender_id, with_statement = false }: IGetBalanceDTO):
+  async getUserBalance({ user_id, with_statement = false }: IGetBalanceDTO):
+
     Promise<
       { balance: number } | { balance: number, statement: Statement[] }
     >
     {
-      // here is where only functionality is using per x,
-      // for instance: if your use functionality CreateStatementUseCase, So you going use 'user_id',
-      // if you use TransferUseCase you will use 'sender_id', because not is possible to use from both
-      // in same time.
-
       const statement = await this.repository.find({
-        where: [
-          { user_id },
-          { sender_id }
-        ]
+        where: { user_id }
       });
 
       const balance = statement.reduce((acc, operation) => {
-        const amount = operation.amount;
-        const type = operation.type;
-
-         switch (type) {
-           case 'transfer':
-           amount - acc;
-           break;
-
-           case 'withdraw':
-           amount - acc;
-           break;
-           
-           default:
-           amount + acc;
-           break;
-         };
-         return amount;
+        if(operation.type === 'withdraw' || operation.type === 'transfer') {
+         return acc - operation.amount;
+        }
+        else {
+          return acc + operation.amount;
+        }
+        
       }, 0);
 
       if (with_statement) {

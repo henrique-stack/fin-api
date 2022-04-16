@@ -4,6 +4,9 @@ import { container } from 'tsyringe';
 import { BalanceMap } from '../../mappers/BalanceMap';
 import { GetBalanceUseCase } from './GetBalanceUseCase';
 
+import { Statement } from '../../entities/Statement';
+
+
 export class GetBalanceController {
   async execute(request: Request, response: Response) {
     const { id: user_id } = request.user;
@@ -14,6 +17,6 @@ export class GetBalanceController {
 
     const balanceDTO = BalanceMap.toDTO(balance);
 
-    return response.json(balanceDTO);
+    return response.send(balanceDTO);
   }
 }
